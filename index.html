@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業興趣探索問卷</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --cR:#E05252;--cI:#4D96FF;--cA:#A855F7;--cS:#22C55E;--cE:#F59E0B;--cC:#F97316;
+  --bg:#FAFAF8;--card:#fff;--text:#1A1A2E;--muted:#6B7280;--border:#E5E7EB;
+  --radius:18px;--radius-sm:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hero-bar{height:5px;background:linear-gradient(90deg,#E05252,#F59E0B,#22C55E,#4D96FF,#A855F7,#F97316);}
+header{background:#1A1A2E;padding:1.25rem 2rem;display:flex;align-items:center;gap:1rem;}
+.logo{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#E05252,#A855F7);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:15px;flex-shrink:0;}
+header h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff;}
+header p{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;}
+.main{max-width:720px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.prog-wrap{margin-bottom:2rem;}
+.prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.prog-track{height:6px;background:#E5E7EB;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#E05252,#A855F7);transition:width .4s;}
+.info-hero{background:linear-gradient(135deg,#1A1A2E,#2D2B55);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;color:#fff;}
+.info-hero h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;margin-bottom:6px;}
+.info-hero p{font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:.875rem;line-height:1.6;}
+.notice-box{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 14px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:1.25rem;}
+.notice-box strong{color:rgba(255,255,255,0.9);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;color:rgba(255,255,255,0.55);font-weight:700;letter-spacing:.06em;}
+.fg input{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:15px;color:#fff;font-family:'Noto Sans TC',sans-serif;transition:border-color .2s;}
+.fg input::placeholder{color:rgba(255,255,255,0.3);}
+.fg input:focus{outline:none;border-color:#F59E0B;}
+.type-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.5rem;}
+.type-pill{border-radius:10px;padding:.75rem .5rem;text-align:center;}
+.type-pill .tl{font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;}
+.type-pill .tn{font-size:10px;font-weight:700;margin-top:2px;line-height:1.3;}
+.q-card{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden;margin-bottom:1rem;}
+.q-header{padding:1rem 1.4rem .4rem;display:flex;align-items:center;gap:10px;}
+.q-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;color:#fff;flex-shrink:0;}
+.q-type-tag{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600;}
+.q-text{font-size:16px;font-weight:700;color:var(--text);padding:.3rem 1.4rem .2rem;line-height:1.5;}
+.q-orig{font-size:11px;color:#C4C9D4;padding:.1rem 1.4rem .75rem;font-style:italic;}
+.likert-wrap{border-top:1px solid #F3F4F6;padding:.875rem 1.4rem 1.1rem;}
+.likert-anchor-row{display:flex;justify-content:space-between;margin-bottom:.5rem;}
+.likert-anchor{font-size:11px;color:var(--muted);}
+.likert-btns{display:flex;gap:6px;}
+.lbtn{flex:1;padding:.6rem .25rem;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;}
+.lbtn-face{font-size:20px;line-height:1;}
+.lbtn-num{font-size:11px;font-weight:700;color:var(--muted);}
+.lbtn:hover{border-color:#4D96FF;background:#F0F7FF;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;}
+.btn-back{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 22px;font-size:14px;cursor:pointer;font-weight:600;color:var(--muted);font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.btn-back:hover{border-color:var(--cI);color:var(--cI);}
+.btn-next{background:linear-gradient(135deg,#E05252,#A855F7);border:none;border-radius:var(--radius-sm);padding:12px 32px;font-size:15px;font-weight:800;cursor:pointer;color:#fff;font-family:'Nunito',sans-serif;box-shadow:0 4px 15px rgba(168,85,247,.25);transition:opacity .15s;}
+.btn-next:hover{opacity:.9;}
+.rpt-hero{background:linear-gradient(135deg,#1A1A2E,#0F3460);border-radius:var(--radius);padding:2.5rem;margin-bottom:1.5rem;color:#fff;}
+.rpt-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;margin-bottom:4px;}
+.rpt-meta{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:1.5rem;}
+.code-badges{display:flex;gap:8px;margin-bottom:10px;}
+.code-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff;}
+.rpt-profile-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;margin-bottom:5px;}
+.rpt-profile-desc{font-size:13px;color:rgba(255,255,255,0.62);line-height:1.7;}
+.sec-h{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;color:var(--text);margin:1.75rem 0 1rem;padding-left:14px;border-left:4px solid #A855F7;}
+.radar-card{background:#fff;border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;border:1.5px solid var(--border);}
+.radar-card h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;margin-bottom:.25rem;}
+.radar-card .rc-sub{font-size:12px;color:var(--muted);margin-bottom:1rem;}
+.hex-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;justify-content:center;}
+.hex-leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);}
+.hex-dot{width:10px;height:10px;border-radius:50%;}
+.score-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.score-tile{border-radius:var(--radius-sm);padding:1rem;text-align:center;}
+.st-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;}
+.st-name{font-size:11px;font-weight:700;margin-top:1px;margin-bottom:6px;opacity:.8;}
+.st-bar-bg{height:6px;background:rgba(0,0,0,0.1);border-radius:3px;margin-bottom:4px;}
+.st-bar-fill{height:6px;border-radius:3px;transition:width .8s ease;}
+.st-raw{font-size:11px;opacity:.7;}
+.detail-card{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);border-left:5px solid;padding:1.5rem;margin-bottom:.875rem;}
+.detail-top{display:flex;align-items:center;gap:12px;margin-bottom:.875rem;}
+.detail-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;flex-shrink:0;}
+.detail-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;}
+.detail-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.detail-desc{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:.875rem;}
+.detail-box{background:#F9FAFB;border-radius:var(--radius-sm);padding:.875rem 1rem;}
+.detail-box-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.75rem;}
+.job-tag{font-size:12px;padding:3px 10px;border-radius:99px;font-weight:600;}
+.q-list{list-style:none;}
+.q-list li{font-size:13px;color:var(--muted);padding:3px 0 3px 16px;position:relative;line-height:1.5;}
+.q-list li::before{content:'→';position:absolute;left:0;font-size:11px;}
+.dl-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.75rem;}
+.dl-btn{flex:1;min-width:200px;padding:14px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.dl-cand{background:linear-gradient(135deg,#E05252,#F97316);color:#fff;box-shadow:0 4px 15px rgba(224,82,82,.25);}
+.dl-hr{background:linear-gradient(135deg,#4D96FF,#A855F7);color:#fff;box-shadow:0 4px 15px rgba(77,150,255,.25);}
+.dl-btn:hover{transform:translateY(-2px);}
+.pdf-notice{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:#92400E;margin-top:10px;line-height:1.6;}
+.disclaimer{background:#F8F9FA;border:1.5px solid #E5E7EB;border-radius:var(--radius-sm);padding:14px 16px;margin-top:10px;font-size:12px;color:#6B7280;line-height:1.75;}
+.disclaimer strong{color:#374151;}
+.restart-btn{width:100%;padding:12px;margin-top:8px;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;color:var(--muted);font-weight:600;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.restart-btn:hover{border-color:var(--cI);color:var(--cI);}
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr;}
+  .type-strip{grid-template-columns:repeat(3,1fr);}
+  .score-strip{grid-template-columns:repeat(2,1fr);}
+  .lbtn-face{font-size:16px;}
+}
+</style>
+</head>
+<body>
+<div class="hero-bar"></div>
+<header>
+  <div class="logo">IP</div>
+  <div>
+    <h1>職業興趣探索問卷</h1>
+    <p>O*NET Mini Interest Profiler · 繁體中文改編版</p>
+  </div>
+</header>
+<div class="main" id="app"></div>
+
+<script>
+// 全部 30 題 — 原文來源：O*NET Mini-IP（Rounds et al., 2016）
+// 經截圖逐題確認，繁體中文改編
+const ITEMS=[
+  {n:1, type:'R',zh:'製作廚房櫥櫃',                      en:'Build kitchen cabinets'},
+  {n:2, type:'I',zh:'研發新藥物',                        en:'Develop a new medicine'},
+  {n:3, type:'A',zh:'寫書或寫劇本',                      en:'Write books or plays'},
+  {n:4, type:'S',zh:'協助有情緒或人際困擾的人',            en:'Help people with personal or emotional problems'},
+  {n:5, type:'E',zh:'管理大公司的一個部門',                en:'Manage a department within a large company'},
+  {n:6, type:'C',zh:'在大型網路中安裝電腦軟體',            en:'Install software across computers on a large network'},
+  {n:7, type:'R',zh:'修理家用電器',                      en:'Repair household appliances'},
+  {n:8, type:'I',zh:'研究減少水污染的方法',               en:'Study ways to reduce water pollution'},
+  {n:9, type:'A',zh:'作曲或編曲',                        en:'Compose or arrange music'},
+  {n:10,type:'S',zh:'提供職涯輔導給他人',                 en:'Give career guidance to people'},
+  {n:11,type:'E',zh:'創辦自己的事業',                    en:'Start your own business'},
+  {n:12,type:'C',zh:'操作計算機進行運算',                 en:'Operate a calculator'},
+  {n:13,type:'R',zh:'組裝電子零件',                      en:'Assemble electronic parts'},
+  {n:14,type:'I',zh:'進行化學實驗',                      en:'Conduct chemical experiments'},
+  {n:15,type:'A',zh:'為電影製作特效',                    en:'Create special effects for movies'},
+  {n:16,type:'S',zh:'執行復健治療',                      en:'Perform rehabilitation therapy'},
+  {n:17,type:'E',zh:'談判商業合約',                      en:'Negotiate business contracts'},
+  {n:18,type:'C',zh:'維護貨物出入庫的記錄',               en:'Keep shipping and receiving records'},
+  {n:19,type:'R',zh:'駕駛卡車將包裹配送到各地',           en:'Drive a truck to deliver packages to offices and homes'},
+  {n:20,type:'I',zh:'用顯微鏡檢驗血液樣本',               en:'Examine blood samples using a microscope'},
+  {n:21,type:'A',zh:'為舞台劇繪製佈景',                   en:'Paint sets for plays'},
+  {n:22,type:'S',zh:'在非營利組織擔任志工',               en:'Do volunteer work at a non-profit organization'},
+  {n:23,type:'E',zh:'為新款服飾進行行銷推廣',             en:'Market a new line of clothing'},
+  {n:24,type:'C',zh:'使用手持電腦進行物品盤點',           en:'Inventory supplies using a hand-held computer'},
+  {n:25,type:'R',zh:'在出貨前檢驗零件品質',               en:'Test the quality of parts before shipment'},
+  {n:26,type:'I',zh:'研發更準確的天氣預測方法',           en:'Develop a way to better predict the weather'},
+  {n:27,type:'A',zh:'為電影或電視節目撰寫劇本',           en:'Write scripts for movies or television shows'},
+  {n:28,type:'S',zh:'在高中擔任老師',                    en:'Teach a high-school class'},
+  {n:29,type:'E',zh:'在百貨公司銷售商品',                 en:'Sell merchandise at a department store'},
+  {n:30,type:'C',zh:'為組織分類、蓋章並分發郵件',         en:'Stamp, sort, and distribute mail for an organization'},
+];
+
+const TYPES={
+  R:{name:'實際型',en:'Realistic',    color:'#E05252',bg:'#FFF0F0',light:'#FFD5D5',icon:'🔧',
+     desc:'喜歡動手操作、使用工具或機械，享受在具體的環境中解決實際問題，重視技術與實用能力。',
+     traits:['動手實作','技術導向','腳踏實地','獨立自主'],
+     jobs:['工程師','技術員','建築施工','機械操作','農業/林業','品管檢驗'],
+     envs:['工廠/現場作業','技術研究室','戶外環境','機具設備操作'],
+     qs:['您在工作中有哪些動手操作或技術應用的經驗？','您傾向獨立完成工作還是與他人密切協作？']},
+  I:{name:'研究型',en:'Investigative',color:'#4D96FF',bg:'#EFF6FF',light:'#BFDBFE',icon:'🔬',
+     desc:'喜歡觀察、分析與解決複雜問題，享受探索抽象理論與未知領域，重視智識上的深度探究。',
+     traits:['分析思考','好奇探索','邏輯嚴謹','獨立判斷'],
+     jobs:['研究員','科學家','數據分析師','醫師','程式工程師','學術工作'],
+     envs:['研究機構','實驗室','資料導向環境','需要深度思考的職位'],
+     qs:['您在工作中如何面對複雜或模糊的問題？','請描述一次您獨立分析並解決問題的經驗。']},
+  A:{name:'藝術型',en:'Artistic',     color:'#A855F7',bg:'#F5F3FF',light:'#DDD6FE',icon:'🎨',
+     desc:'喜歡自由創作、表達與審美，享受發揮想像力與創意，傾向不受固定規則限制的工作環境。',
+     traits:['富有創意','表達力強','審美敏感','開放彈性'],
+     jobs:['設計師','文案/編輯','藝術工作者','行銷創意','音樂/表演','影視製作'],
+     envs:['創意工作室','彈性工時環境','鼓勵創新的組織','文化/媒體產業'],
+     qs:['您如何在工作中發揮創意或表達個人觀點？','請描述一個您認為最能展現您創造力的工作成果。']},
+  S:{name:'社會型',en:'Social',       color:'#22C55E',bg:'#F0FFF4',light:'#BBF7D0',icon:'🤝',
+     desc:'喜歡與人互動、協助、教導或服務他人，重視人際關係與團隊合作，善於溝通與同理他人。',
+     traits:['善於溝通','關懷他人','團隊合作','耐心傾聽'],
+     jobs:['教師/培訓師','諮商/社工','人力資源','客服/公關','醫療照護','社區工作'],
+     envs:['需要大量人際互動','教育/培訓機構','服務導向組織','協作型團隊'],
+     qs:['您在與他人合作或協助他人時，通常扮演什麼角色？','請描述一次您成功影響或幫助他人的經驗。']},
+  E:{name:'企業型',en:'Enterprising', color:'#F59E0B',bg:'#FFFBEB',light:'#FDE68A',icon:'🚀',
+     desc:'喜歡領導、說服、影響他人並追求目標，享受競爭性環境，重視成就感、影響力與商業成果。',
+     traits:['目標導向','說服力強','勇於承擔','積極主動'],
+     jobs:['業務/銷售','創業家','管理職','行銷企劃','投資/金融','談判/公關'],
+     envs:['競爭性工作環境','業績導向組織','需要帶領團隊','對外折衝協調'],
+     qs:['請描述一次您說服他人或帶領團隊達成目標的經驗。','您如何設定工作目標並驅動自己達成？']},
+  C:{name:'傳統型',en:'Conventional', color:'#F97316',bg:'#FFF7ED',light:'#FED7AA',icon:'📋',
+     desc:'喜歡有組織、有條理且遵循規範的工作，享受處理數據、文件與系統性任務，重視精確與可靠。',
+     traits:['細心嚴謹','系統組織','遵守規範','可靠穩定'],
+     jobs:['會計/財務','行政管理','法規遵循','資料處理','品質管理','文件管理'],
+     envs:['流程明確的組織','需要精確度的工作','有清楚規範的環境','數據/文件導向職位'],
+     qs:['您如何確保工作的精確性與一致性？','請描述您處理複雜資料或文件的經驗。']},
+};
+
+const PROFILE_NAMES={
+  RI:'技術研究型',IR:'研究技術型',RA:'技術創意型',AR:'創意技術型',
+  RS:'技術服務型',SR:'服務技術型',RE:'技術管理型',ER:'管理技術型',
+  RC:'技術行政型',CR:'行政技術型',IA:'研究藝術型',AI:'藝術研究型',
+  IS:'研究服務型',SI:'服務研究型',IE:'研究管理型',EI:'管理研究型',
+  IC:'研究行政型',CI:'行政研究型',AS:'藝術服務型',SA:'服務藝術型',
+  AE:'藝術企業型',EA:'企業藝術型',AC:'藝術行政型',CA:'行政藝術型',
+  SE:'服務管理型',ES:'管理服務型',SC:'服務行政型',CS:'行政服務型',
+  EC:'企業行政型',CE:'行政企業型',
+};
+
+const FACES=['😖','😟','😐','🙂','😄'];
+const SEL_COLORS=['#E05252','#F97316','#9CA3AF','#22C55E','#16A34A'];
+const PAGE_SIZE=6;
+const totalPages=Math.ceil(ITEMS.length/PAGE_SIZE);
+let phase='info',page=0,answers={},userInfo={},radarChart=null;
+const app=document.getElementById('app');
+
+function render(){
+  if(phase==='info') renderInfo();
+  else if(phase==='quiz') renderQuiz();
+  else renderReport();
+}
+
+function renderInfo(){
+  app.innerHTML=`
+  <div class="info-hero">
+    <h2>職業興趣探索問卷</h2>
+    <p>本問卷改編自 O*NET Mini Interest Profiler（Rounds et al., 2016），共 30 題，預計 8–12 分鐘完成。</p>
+    <div class="notice-box">
+      <strong>使用說明與限制</strong><br>
+      本問卷題目改編自美國勞工部 O*NET Mini Interest Profiler，依據 Holland（1997）RIASEC 職業興趣理論設計，原版已通過信效度驗證。本繁體中文改編版<strong>尚未完成本土常模建立</strong>，結果僅供參考，不應作為人才篩選的唯一依據。每題請依照您「最真實的興趣」作答，沒有對錯之分。
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>姓名 *</label><input type="text" id="f-name" placeholder="請輸入您的姓名" value="${userInfo.name||''}"></div>
+      <div class="fg"><label>聯絡電話 *</label><input type="tel" id="f-phone" placeholder="例：0912345678" value="${userInfo.phone||''}"></div>
+    </div>
+    <div style="margin-top:10px">
+      <div class="fg"><label>電子信箱 *</label><input type="email" id="f-email" placeholder="example@email.com" value="${userInfo.email||''}"></div>
+    </div>
+  </div>
+  <div class="type-strip">
+    ${Object.entries(TYPES).map(([k,t])=>`
+      <div class="type-pill" style="background:${t.bg};border:1.5px solid ${t.light}">
+        <div class="tl" style="color:${t.color}">${k}</div>
+        <div class="tn" style="color:${t.color}">${t.name}</div>
+      </div>`).join('')}
+  </div>
+  <div class="nav-row" style="justify-content:flex-end">
+    <button class="btn-next" onclick="startQuiz()">開始作答 →</button>
+  </div>`;
+}
+
+function startQuiz(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  if(!name||!phone||!email){alert('請填寫所有欄位');return;}
+  if(!/^\d{8,12}$/.test(phone)){alert('電話格式不正確（請輸入純數字）');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Email 格式不正確');return;}
+  userInfo={name,phone,email};
+  phase='quiz';page=0;render();
+}
+
+function renderQuiz(){
+  const start=page*PAGE_SIZE;
+  const end=Math.min(start+PAGE_SIZE,ITEMS.length);
+  const pageItems=ITEMS.slice(start,end);
+  const prog=Math.round((start/ITEMS.length)*100);
+  let html=`
+  <div class="prog-wrap">
+    <div class="prog-row"><span>第 ${start+1}–${end} 題，共 ${ITEMS.length} 題</span><span>${prog}%</span></div>
+    <div class="prog-track"><div class="prog-fill" style="width:${prog}%"></div></div>
+  </div>
+  <div style="background:#fff;border-radius:var(--radius);padding:1rem 1.4rem;margin-bottom:1rem;border:1.5px solid var(--border)">
+    <p style="font-size:14px;color:var(--muted);line-height:1.6">請針對每一項活動，選擇您「想從事這項活動的程度」。請依照最真實的興趣作答，不需考慮薪資或自身能力。</p>
+  </div>
+  ${pageItems.map((item,i)=>{
+    const gi=start+i;
+    const saved=answers[gi];
+    const t=TYPES[item.type];
+    return `<div class="q-card" id="qc${gi}">
+      <div class="q-header">
+        <div class="q-badge" style="background:#9CA3AF">${item.n}</div>
+      </div>
+      <div class="q-text">${item.zh}</div>
+      <div class="q-orig">${item.en}</div>
+      <div class="likert-wrap">
+        <div class="likert-anchor-row">
+          <span class="likert-anchor">絕對不想做</span>
+          <span class="likert-anchor">非常想做</span>
+        </div>
+        <div class="likert-btns">
+          ${[1,2,3,4,5].map(v=>`
+            <button class="lbtn" id="lb${gi}_${v}"
+              style="${saved===v?`background:${SEL_COLORS[v-1]};border-color:${SEL_COLORS[v-1]};`:''}"
+              onclick="selItem(${gi},${v})">
+              <span class="lbtn-face">${FACES[v-1]}</span>
+              <span class="lbtn-num" style="${saved===v?'color:#fff':''}">${v}</span>
+            </button>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('')}
+  <div class="nav-row">
+    <button class="btn-back" onclick="prevPage()" style="visibility:${page===0?'hidden':'visible'}">← 上一頁</button>
+    <button class="btn-next" onclick="nextPage()">${page===totalPages-1?'查看結果 →':'下一頁 →'}</button>
+  </div>`;
+  app.innerHTML=html;
+  window.scrollTo(0,0);
+}
+
+function selItem(idx,val){
+  answers[idx]=val;
+  for(let v=1;v<=5;v++){
+    const b=document.getElementById('lb'+idx+'_'+v);
+    if(!b) continue;
+    const isSel=v===val;
+    b.style.background=isSel?SEL_COLORS[v-1]:'';
+    b.style.borderColor=isSel?SEL_COLORS[v-1]:'';
+    const num=b.querySelector('.lbtn-num');
+    if(num) num.style.color=isSel?'#fff':'';
+  }
+}
+
+function pageAllAnswered(){
+  const start=page*PAGE_SIZE;
+  const end=Math.min(start+PAGE_SIZE,ITEMS.length);
+  for(let i=start;i<end;i++){if(answers[i]===undefined) return false;}
+  return true;
+}
+
+function nextPage(){
+  if(!pageAllAnswered()){alert('請完成本頁所有題目後再繼續。');return;}
+  if(page<totalPages-1){page++;renderQuiz();}
+  else{phase='report';render();}
+}
+function prevPage(){if(page>0){page--;renderQuiz();}}
+
+function calcScores(){
+  const s={R:0,I:0,A:0,S:0,E:0,C:0};
+  ITEMS.forEach((item,i)=>{s[item.type]+=(answers[i]||0);});
+  return s;
+}
+function getRanked(s){
+  return Object.entries(s).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+
+function renderReport(){
+  const scores=calcScores();
+  const ranked=getRanked(scores);
+  const [top1,top2,top3]=ranked;
+  const profileName=PROFILE_NAMES[top1+top2]||top1+top2+top3+'型';
+  const now=new Date().toLocaleDateString('zh-TW');
+  const MAX=25;
+
+  app.innerHTML=`
+  <div class="rpt-hero">
+    <div class="rpt-name">${userInfo.name} 的職業興趣側寫</div>
+    <div class="rpt-meta">${userInfo.email} ｜ ${userInfo.phone} ｜ ${now}</div>
+    <div class="code-badges">
+      ${[top1,top2,top3].map(k=>`<div class="code-badge" style="background:${TYPES[k].color}">${k}</div>`).join('')}
+    </div>
+    <div class="rpt-profile-name">${profileName} · ${TYPES[top1].name}主導</div>
+    <div class="rpt-profile-desc">前三高興趣類型依序為 ${[top1,top2,top3].map(k=>TYPES[k].name).join('、')}。${TYPES[top1].desc.slice(0,50)}……</div>
+  </div>
+
+  <div class="sec-h">六型興趣輪廓圖</div>
+  <div class="radar-card">
+    <h3>RIASEC 雷達圖</h3>
+    <p class="rc-sub">圖形形狀反映六型之間的相對強弱，各型滿分 25 分（5 題 × 最高 5 分）。數值僅供相對比較，不代表能力高低。</p>
+    <div style="position:relative;height:300px">
+      <canvas id="radarChart" role="img" aria-label="RIASEC六型興趣雷達圖">
+        ${Object.entries(scores).map(([k,v])=>`${TYPES[k].name}：${v}分`).join('、')}
+      </canvas>
+    </div>
+    <div class="hex-legend">
+      ${Object.entries(TYPES).map(([k,t])=>`<div class="hex-leg">
+        <div class="hex-dot" style="background:${t.color}"></div>
+        <span>${k} ${t.name}（${scores[k]}分）</span>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="sec-h">各型強度比較</div>
+  <div class="score-strip">
+    ${ranked.map((k,ri)=>{
+      const t=TYPES[k],s=scores[k];
+      const pct=Math.round((s/MAX)*100);
+      return `<div class="score-tile" style="background:${t.bg};border:1.5px solid ${t.light}">
+        <div class="st-letter" style="color:${t.color}">${k}${ri===0?' ★':ri===1?' ☆':''}</div>
+        <div class="st-name" style="color:${t.color}">${t.name}</div>
+        <div class="st-bar-bg"><div class="st-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
+        <div class="st-raw" style="color:${t.color}">${s} / ${MAX}</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="sec-h">前三高類型詳細說明（供主管參考）</div>
+  ${[top1,top2,top3].map((k,ri)=>{
+    const t=TYPES[k];
+    const label=ri===0?'主要類型':ri===1?'次要類型':'第三類型';
+    return `<div class="detail-card" style="border-left-color:${t.color}">
+      <div class="detail-top">
+        <div class="detail-circle" style="background:${t.color}">${k}</div>
+        <div>
+          <div class="detail-title" style="color:${t.color}">${t.name} ${t.icon}</div>
+          <div class="detail-sub">${label} · ${t.en} · ${scores[k]} / ${MAX} 分</div>
+        </div>
+      </div>
+      <div class="detail-desc">${t.desc}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.875rem">
+        ${t.traits.map(tr=>`<span style="background:${t.bg};color:${t.color};font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid ${t.light}">${tr}</span>`).join('')}
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-title">適合的工作類型</div>
+        <div class="tag-row">
+          ${t.jobs.map(j=>`<span class="job-tag" style="background:${t.bg};color:${t.color};border:1px solid ${t.light}">${j}</span>`).join('')}
+        </div>
+        <div class="detail-box-title" style="margin-top:.5rem">建議面試追問</div>
+        <ul class="q-list">${t.qs.map(q=>`<li>${q}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }).join('')}
+
+  <div class="dl-row">
+    <button class="dl-btn dl-cand" onclick="dlPDF('candidate')"><span style="font-size:18px">📄</span> 下載個人版（加密）</button>
+    <button class="dl-btn dl-hr" onclick="dlPDF('hr')"><span style="font-size:18px">📋</span> 下載 HR 版</button>
+  </div>
+  <div class="pdf-notice">個人版 PDF 密碼為手機號碼後 3 碼。HR 版無密碼保護。</div>
+  <div class="disclaimer">
+    <strong>使用限制聲明</strong><br>
+    本問卷題目改編自 O*NET Mini Interest Profiler（Rounds, Ming, Cao, Song, &amp; Lewis, 2016），依據 Holland（1997）RIASEC 職業興趣理論設計。原版 Mini-IP 已通過英文版信效度驗證，<strong>本繁體中文改編版尚未完成本土常模建立與信效度驗證</strong>。各類型得分反映填答者的自我興趣陳述，不代表實際能力或工作表現。本結果僅供主管作為面試對話的<strong>參考起點</strong>，不應作為人才篩選、錄用或績效評估的單一或主要依據。如需正式職業興趣評量，建議採用 Strong Interest Inventory（SII）或 Self-Directed Search（SDS）等已完成本土驗證之工具。
+  </div>
+  <button class="restart-btn" onclick="restart()">重新填寫問卷</button>`;
+
+  setTimeout(initRadar,100);
+}
+
+function initRadar(){
+  const ctx=document.getElementById('radarChart');
+  if(!ctx) return;
+  if(radarChart) radarChart.destroy();
+  const scores=calcScores();
+  const keys=['R','I','A','S','E','C'];
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:keys.map(k=>`${k} ${TYPES[k].name}`),
+      datasets:[{
+        label:'興趣強度',
+        data:keys.map(k=>scores[k]),
+        backgroundColor:'rgba(168,85,247,0.1)',
+        borderColor:'#A855F7',
+        borderWidth:2.5,
+        pointBackgroundColor:keys.map(k=>TYPES[k].color),
+        pointBorderColor:'#fff',
+        pointBorderWidth:2,
+        pointRadius:7,
+        pointHoverRadius:9,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{r:{
+        min:0,max:25,
+        ticks:{stepSize:5,color:'#9CA3AF',backdropColor:'transparent',font:{size:10}},
+        grid:{color:'rgba(0,0,0,0.06)'},
+        angleLines:{color:'rgba(0,0,0,0.06)'},
+        pointLabels:{color:'#374151',font:{size:12,weight:'700'}}
+      }},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{
+          const k=keys[ctx.dataIndex];
+          return ` ${TYPES[k].name}：${ctx.raw} 分`;
+        }}}
+      }
+    }
+  });
+}
+
+function dlPDF(type){
+  const {jsPDF}=window.jspdf;
+  const scores=calcScores();
+  const ranked=getRanked(scores);
+  const [top1,top2,top3]=ranked;
+  const profileName=PROFILE_NAMES[top1+top2]||top1+top2+top3+'型';
+  const now=new Date().toLocaleDateString('zh-TW');
+  const password=userInfo.phone.slice(-3);
+  const MAX=25;
+  const dcMap={R:[224,82,82],I:[77,150,255],A:[168,85,247],S:[34,197,94],E:[245,158,11],C:[249,115,22]};
+
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,M=20;
+  let y=0;
+
+  doc.setFillColor(26,26,46);
+  doc.rect(0,0,W,44,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(17);doc.setFont('helvetica','bold');
+  doc.text('Holland RIASEC Interest Profile',W/2,15,{align:'center'});
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text(userInfo.name+' | '+now,W/2,26,{align:'center'});
+  doc.text(userInfo.email+' | '+userInfo.phone,W/2,35,{align:'center'});
+  y=52;
+
+  doc.setFillColor(239,246,255);
+  doc.roundedRect(M,y,W-M*2,20,4,4,'F');
+  doc.setTextColor(26,26,46);
+  doc.setFontSize(12);doc.setFont('helvetica','bold');
+  doc.text('Code: '+top1+top2+top3+' | '+profileName,W/2,y+8,{align:'center'});
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(55,65,81);
+  doc.text([top1,top2,top3].map(k=>TYPES[k].name+' ('+scores[k]+'/'+MAX+')').join('  |  '),W/2,y+16,{align:'center'});
+  y+=28;
+
+  doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(26,26,46);
+  doc.text('Interest Scores (max '+MAX+' per type)',M,y);y+=6;
+  ['R','I','A','S','E','C'].forEach(k=>{
+    const s=scores[k],dc=dcMap[k];
+    doc.setFillColor(230,230,230);
+    doc.rect(M+28,y,W-M*2-28,5,'F');
+    doc.setFillColor(...dc);
+    doc.rect(M+28,y,(W-M*2-28)*(s/MAX),5,'F');
+    doc.setTextColor(...dc);doc.setFontSize(9);doc.setFont('helvetica','bold');
+    doc.text(k+' '+TYPES[k].name,M,y+4);
+    doc.setTextColor(80,80,80);
+    doc.text(s+'/'+MAX,W-M+2,y+4);
+    y+=9;
+  });
+  y+=6;
+
+  [top1,top2,top3].forEach((k,ri)=>{
+    if(y>250){doc.addPage();y=20;}
+    const t=TYPES[k],dc=dcMap[k];
+    const label=ri===0?'Primary':ri===1?'Secondary':'Third';
+    doc.setFillColor(...dc);
+    doc.rect(M,y,5,20,'F');
+    doc.setFillColor(249,250,251);
+    doc.rect(M+5,y,W-M*2-5,20,'F');
+    doc.setTextColor(...dc);doc.setFontSize(11);doc.setFont('helvetica','bold');
+    doc.text(k+' '+t.name+' ('+label+')',M+8,y+8);
+    doc.setTextColor(55,65,81);doc.setFontSize(9);doc.setFont('helvetica','normal');
+    doc.text('Score: '+scores[k]+' / '+MAX+' | '+t.en,M+8,y+16);
+    y+=24;
+    const dl=doc.splitTextToSize(t.desc,W-M*2);
+    doc.setFontSize(10);doc.setTextColor(55,65,81);
+    doc.text(dl,M,y);y+=dl.length*5+3;
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(100,116,139);
+    doc.text('Suitable roles: '+t.jobs.join(' / '),M,y);y+=5;
+    if(type==='hr'){
+      doc.text('Interview questions:',M,y);y+=4;
+      doc.setFont('helvetica','normal');
+      t.qs.forEach(q=>{
+        const ql=doc.splitTextToSize('• '+q,W-M*2-4);
+        doc.text(ql,M+2,y);y+=ql.length*4.5;
+      });
+    }
+    y+=8;
+  });
+
+  if(y>252){doc.addPage();y=20;}
+  doc.setFillColor(248,249,250);
+  doc.rect(M,y,W-M*2,22,'F');
+  doc.setTextColor(130,130,130);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+  const dis='Items adapted from O*NET Mini Interest Profiler (Rounds, Ming, Cao, Song & Lewis, 2016), based on Holland (1997) RIASEC theory. The original English Mini-IP has been validated; this Traditional Chinese adaptation has not yet undergone local normative standardization. Results reflect self-reported interest only and should not be used as a sole basis for hiring decisions.';
+  const disL=doc.splitTextToSize(dis,W-M*2-8);
+  doc.text(disL,M+4,y+5);
+  doc.setFontSize(8);doc.setTextColor(180,180,180);
+  doc.text('Holland RIASEC Interest Profile | '+now,W/2,290,{align:'center'});
+
+  if(type==='candidate'){
+    try{doc.setEncryption(password,'',['print','copy']);}catch(e){}
+    doc.save(userInfo.name+'_職業興趣報告（個人版）.pdf');
+  } else {
+    doc.save(userInfo.name+'_職業興趣報告（HR版）.pdf');
+  }
+}
+
+function restart(){
+  phase='info';page=0;answers={};userInfo={};
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
